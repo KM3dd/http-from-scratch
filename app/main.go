@@ -5,6 +5,9 @@ import (
 	"net"
 	"os"
 	"strings"
+
+	"github.com/KM3dd/http-from-scratch/internal/types"
+	"github.com/KM3dd/http-from-scratch/internal/utils"
 )
 
 var _ = net.Listen
@@ -43,26 +46,30 @@ func HandleRequest(conn net.Conn) {
 	response := MakeResponse(buf, n)
 	conn.Write(response)
 	conn.Close()
+
 }
 
 func MakeResponse(buf []byte, n int) []byte {
 	var response []byte
+	var resp types.Response
+
 	request := strings.Split(string(buf[:n]), "\r\n")
 	request_line := request[0]
 
 	route := strings.Split(request_line, " ")[1]
 	fmt.Println("Received request for route: ", route)
 	if route == "/" {
-		response = []byte("HTTP/1.1 200 OK\r\n\r\n")
+		resp = types.Response{Code: 200, Message: "OK"}
 
 	} else if strings.Split(route, "/")[1] == "echo" {
 		text := strings.Split(route, "/")[2]
-		response = []byte(fmt.Sprintf("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s", len(text), text))
+		resp = types.Response{Code: 200, Message: "OK", ContentType: "text/plain", ContentLength: len(text), Body: text}
 	} else if strings.Split(route, "/")[1] == "user-agent" {
 		user_agent := strings.TrimSpace(strings.Split(request[2], ":")[1])
-		response = []byte(fmt.Sprintf("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s", len(user_agent), user_agent))
+		resp = types.Response{Code: 200, Message: "OK", ContentType: "text/plain", ContentLength: len(user_agent), Body: user_agent}
 	} else {
-		response = []byte("HTTP/1.1 404 Not Found\r\n\r\n")
+		resp = types.Response{Code: 404, Message: "Not Found"}
 	}
+	response = utils.BuildResponse(resp)
 	return response
 }
