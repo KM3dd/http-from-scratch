@@ -36,6 +36,10 @@ func main() {
 	if route == "/" {
 		conn.Write([]byte("HTTP/1.1 200 OK\r\n\r\n"))
 
+	} else if strings.Split(route, "/")[1] == "echo" {
+		text := strings.Split(route, "/")[2]
+		response := fmt.Sprintf("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s", len(text), text)
+		conn.Write([]byte(response))
 	} else {
 		conn.Write([]byte("HTTP/1.1 404 Not Found\r\n\r\n"))
 	}
