@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/KM3dd/http-from-scratch/internal/types"
 )
@@ -24,4 +25,19 @@ func BuildResponse(response types.Response) []byte {
 	resp = []byte(first_line + content_type + content_length + CRLF + response.Body)
 
 	return resp
+}
+
+func ParseRequest(buf []byte, n int) types.Request {
+
+	request := strings.Split(string(buf[:n]), "\r\n")
+
+	first_request_line := strings.Split(request[0], " ")
+
+	operation := first_request_line[0]
+	route := first_request_line[1]
+	headers := request[1 : len(request)-2]
+	body := request[len(request)-1]
+
+	return types.Request{Operation: operation, Route: route, Headers: headers, Body: body}
+
 }

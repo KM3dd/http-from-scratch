@@ -6,6 +6,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/KM3dd/http-from-scratch/internal/handlers"
 	"github.com/KM3dd/http-from-scratch/internal/types"
 	"github.com/KM3dd/http-from-scratch/internal/utils"
 )
@@ -53,22 +54,20 @@ func MakeResponse(buf []byte, n int) []byte {
 	var response []byte
 	var resp types.Response
 
-	request := strings.Split(string(buf[:n]), "\r\n")
-	request_line := request[0]
+	request := utils.ParseRequest(buf, n)
 
-	route := strings.Split(request_line, " ")[1]
-	fmt.Println("Received request for route: ", route)
-	if route == "/" {
-		resp = types.Response{Code: 200, Message: "OK"}
+	if request.Route == "/" {
+		resp = handlers.RootHnadler()
 
-	} else if strings.Split(route, "/")[1] == "echo" {
-		text := strings.Split(route, "/")[2]
-		resp = types.Response{Code: 200, Message: "OK", ContentType: "text/plain", ContentLength: len(text), Body: text}
-	} else if strings.Split(route, "/")[1] == "user-agent" {
-		user_agent := strings.TrimSpace(strings.Split(request[2], ":")[1])
-		resp = types.Response{Code: 200, Message: "OK", ContentType: "text/plain", ContentLength: len(user_agent), Body: user_agent}
+	} else if strings.Split(request.Route, "/")[1] == "echo" {
+		resp = handlers.EchoHandler(request.Route)
+
+	} else if strings.Split(request.Route, "/")[1] == "user-agent" {
+		resp = handlers.UserAgentHandler(request)
+
 	} else {
-		resp = types.Response{Code: 404, Message: "Not Found"}
+		resp = handlers.NotFoundHandler()
+
 	}
 	response = utils.BuildResponse(resp)
 	return response

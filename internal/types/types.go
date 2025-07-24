@@ -2,7 +2,8 @@ package types
 
 type Request struct {
 	Operation string
-	Headers   string
+	Route     string
+	Headers   []string
 	Body      string
 }
 
