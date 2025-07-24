@@ -30,10 +30,11 @@ func ParseRequest(buf []byte, n int) types.Request {
 
 	request := strings.Split(string(buf[:n]), "\r\n")
 
-	first_request_line := strings.Split(request[0], " ")
+	request_first_line := strings.Split(request[0], " ")
 
-	operation := first_request_line[0]
-	route := first_request_line[1]
+	operation := request_first_line[0]
+	route := strings.Split(request_first_line[1], "/")[1:]
+	fmt.Println("Here is route :", route)
 	headers := request[1 : len(request)-2]
 	body := request[len(request)-1]
 

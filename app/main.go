@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net"
 	"os"
-	"strings"
 
 	"github.com/KM3dd/http-from-scratch/internal/handlers"
 	"github.com/KM3dd/http-from-scratch/internal/types"
@@ -56,21 +55,19 @@ func MakeResponse(buf []byte, n int) []byte {
 
 	request := utils.ParseRequest(buf, n)
 
-	if request.Route == "/" {
+	switch request.Route[0] {
+	case "":
 		resp = handlers.RootHnadler()
-
-	} else if strings.Split(request.Route, "/")[1] == "echo" {
-		resp = handlers.EchoHandler(request.Route)
-
-	} else if strings.Split(request.Route, "/")[1] == "user-agent" {
+	case "echo":
+		resp = handlers.EchoHandler(request)
+	case "user-agent":
 		resp = handlers.UserAgentHandler(request)
-
-	} else if strings.Split(request.Route, "/")[1] == "files" {
+	case "files":
 		resp = handlers.FilesHandler(request)
-	} else {
+	default:
 		resp = handlers.NotFoundHandler()
-
 	}
+
 	response = utils.BuildResponse(resp)
 	return response
 }
