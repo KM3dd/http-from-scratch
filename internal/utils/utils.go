@@ -19,11 +19,10 @@ func BuildResponse(response types.Response) []byte {
 		content_type = fmt.Sprintf("Content-Type: %s\r\n", response.ContentType)
 	}
 	if response.ContentLength != 0 {
-		content_type = fmt.Sprintf("Content-Length: %d\r\n", response.ContentLength)
+		content_length = fmt.Sprintf("Content-Length: %d\r\n", response.ContentLength)
 	}
 
 	resp = []byte(first_line + content_type + content_length + CRLF + response.Body)
-
 	return resp
 }
 

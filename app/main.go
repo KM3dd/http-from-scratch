@@ -65,6 +65,8 @@ func MakeResponse(buf []byte, n int) []byte {
 	} else if strings.Split(request.Route, "/")[1] == "user-agent" {
 		resp = handlers.UserAgentHandler(request)
 
+	} else if strings.Split(request.Route, "/")[1] == "files" {
+		resp = handlers.FilesHandler(request)
 	} else {
 		resp = handlers.NotFoundHandler()
 

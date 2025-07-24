@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"fmt"
+	"os"
 	"strings"
 
 	"github.com/KM3dd/http-from-scratch/internal/types"
@@ -22,4 +24,20 @@ func EchoHandler(route string) types.Response {
 func UserAgentHandler(request types.Request) types.Response {
 	user_agent := strings.TrimSpace(strings.Split(request.Headers[1], ":")[1])
 	return types.Response{Code: 200, Message: "OK", ContentType: "text/plain", ContentLength: len(user_agent), Body: user_agent}
+}
+
+func FilesHandler(request types.Request) types.Response {
+	file_name := strings.Split(request.Route, "/")[2]
+	path := fmt.Sprintf("/tmp/%s", file_name)
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		return types.Response{Code: 404, Message: "Not Found"}
+	}
+
+	// Read file content
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return types.Response{Code: 500, Message: "Something went wrong"}
+	}
+
+	return types.Response{Code: 200, Message: "OK", ContentType: "application/octet-stream", ContentLength: len(string(data)), Body: string(data)}
 }
