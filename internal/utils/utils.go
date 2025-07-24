@@ -34,7 +34,6 @@ func ParseRequest(buf []byte, n int) types.Request {
 
 	operation := request_first_line[0]
 	route := strings.Split(request_first_line[1], "/")[1:]
-	fmt.Println("Here is route :", route)
 	headers := request[1 : len(request)-2]
 	body := request[len(request)-1]
 

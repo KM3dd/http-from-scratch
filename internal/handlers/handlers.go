@@ -30,15 +30,29 @@ func FilesHandler(request types.Request) types.Response {
 	file_name := request.Route[1]
 	path := fmt.Sprintf("/tmp/%s", file_name)
 
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		return types.Response{Code: 404, Message: "Not Found"}
-	}
+	if request.Operation == "GET" {
+		if _, err := os.Stat(path); os.IsNotExist(err) {
+			return types.Response{Code: 404, Message: "Not Found"}
+		}
 
-	// Read file content
-	data, err := os.ReadFile(path)
-	if err != nil {
-		return types.Response{Code: 500, Message: "Something went wrong"}
-	}
+		// Read file content
+		data, err := os.ReadFile(path)
+		if err != nil {
+			return types.Response{Code: 500, Message: "Something went wrong"}
+		}
 
-	return types.Response{Code: 200, Message: "OK", ContentType: "application/octet-stream", ContentLength: len(string(data)), Body: string(data)}
+		return types.Response{Code: 200, Message: "OK", ContentType: "application/octet-stream", ContentLength: len(string(data)), Body: string(data)}
+	} else if request.Operation == "POST" {
+		data := request.Body
+		err := os.WriteFile(path, []byte(data), 0644)
+		if err != nil {
+			fmt.Println("Error writing file:", err)
+			return types.Response{Code: 500, Message: "Something went wrong"}
+		}
+
+		fmt.Println("File written successfully.")
+
+		return types.Response{Code: 201, Message: "Created"}
+	}
+	return types.Response{Code: 500, Message: "Something went wrong"}
 }
