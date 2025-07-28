@@ -67,7 +67,6 @@ func MakeResponse(buf []byte, n int) []byte {
 	default:
 		resp = handlers.NotFoundHandler()
 	}
-
 	response = utils.BuildResponse(resp)
 	return response
 }

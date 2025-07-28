@@ -3,7 +3,6 @@ package handlers
 import (
 	"fmt"
 	"os"
-	"strings"
 
 	"github.com/KM3dd/http-from-scratch/internal/types"
 )
@@ -22,7 +21,7 @@ func EchoHandler(request types.Request) types.Response {
 }
 
 func UserAgentHandler(request types.Request) types.Response {
-	user_agent := strings.TrimSpace(strings.Split(request.Headers[1], ":")[1])
+	user_agent := request.Headers["user-agent"]
 	return types.Response{Code: 200, Message: "OK", ContentType: "text/plain", ContentLength: len(user_agent), Body: user_agent}
 }
 
@@ -40,8 +39,8 @@ func FilesHandler(request types.Request) types.Response {
 		if err != nil {
 			return types.Response{Code: 500, Message: "Something went wrong"}
 		}
-
 		return types.Response{Code: 200, Message: "OK", ContentType: "application/octet-stream", ContentLength: len(string(data)), Body: string(data)}
+
 	} else if request.Operation == "POST" {
 		data := request.Body
 		err := os.WriteFile(path, []byte(data), 0644)
